@@ -71,7 +71,6 @@ MCP OpenDART is designed to be used with AI assistants through IDE integration.
       "command": "YOUR_LOCATION/.venv/bin/mcp-opendart",
       "env": {
         "OPENDART_API_KEY": "API-KEY",
-        "OPENDART_BASE_URL": "https://opendart.fss.or.kr/api/",
         "HOST": "0.0.0.0",
         "PORT": "8000",
         "TRANSPORT": "stdio",

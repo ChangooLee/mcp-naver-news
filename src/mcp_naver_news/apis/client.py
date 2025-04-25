@@ -6,29 +6,27 @@ from typing import Dict, Any, Optional
 import zipfile
 import io
 
-from ..config import opendart_config, OpenDartConfig
+from ..config import naver_news_config, NaverNewsConfig
 
 # 로거 설정
 logger = logging.getLogger(__name__)
 
-class OpenDartClient:
-    """OpenDART API 클라이언트"""
+class NaverNewsClient:
+    """Naver News API 클라이언트"""
     
-    def __init__(self, config: Optional[OpenDartConfig] = None):
-        self.config = config or opendart_config
-        self.api_key = self.config.api_key
+    def __init__(self, config: Optional[NaverNewsConfig] = None):
+        self.config = config or naver_news_config
+        self.client_id = self.config.client_id
+        self.client_secret = self.config.client_secret
         self.base_url = self.config.base_url
         
-        if not self.api_key:
-            raise ValueError("OpenDART API 키가 설정되지 않았습니다.")
+        if not self.client_id or not self.client_secret:
+            raise ValueError("Naver News API 클라이언트 ID와 시크릿이 설정되지 않았습니다.")
     
     def _make_request(self, endpoint: str, params: Optional[Dict[str, Any]] = None, method: str = "GET") -> Dict[str, Any]:
         """API 요청을 보내고 응답을 반환합니다."""
         if params is None:
             params = {}
-        
-        # API 키 추가
-        params["crtfc_key"] = self.api_key
         
         url = urljoin(self.base_url, endpoint)
         
@@ -39,11 +37,17 @@ class OpenDartClient:
         logger.debug(f"Parameters: {params}")
         logger.debug("====================")
         
+        headers = {
+            "X-Naver-Client-Id": self.client_id,
+            "X-Naver-Client-Secret": self.client_secret,
+            "Accept": "application/json"
+        }
+        
         try:
             if method.upper() == "GET":
-                response = requests.get(url, params=params)
+                response = requests.get(url, params=params, headers=headers)
             elif method.upper() == "POST":
-                response = requests.post(url, data=params)
+                response = requests.post(url, data=params, headers=headers)
             else:
                 raise ValueError(f"지원하지 않는 HTTP 메서드: {method}")
             
@@ -62,33 +66,12 @@ class OpenDartClient:
             if "application/json" in content_type:
                 data: Dict[str, Any] = response.json()
                 return data
-            elif "application/zip" in content_type or "application/x-zip-compressed" in content_type:
-                return {
-                    "status": "000",
-                    "message": "정상",
-                    "content": response.content
-                }
-            elif "text/xml" in content_type or "application/xml" in content_type:
+            else:
                 return {
                     "status": "000",
                     "message": "정상",
                     "content": response.text
                 }
-            else:
-                # 응답이 zip 파일인지 확인
-                try:
-                    zip_file = zipfile.ZipFile(io.BytesIO(response.content))
-                    return {
-                        "status": "000",
-                        "message": "정상",
-                        "content": response.content
-                    }
-                except:
-                    return {
-                        "status": "000",
-                        "message": "정상",
-                        "content": response.text
-                    }
         
         except requests.RequestException as e:
             logger.error(f"API 요청 실패: {str(e)}")
@@ -117,7 +100,7 @@ class OpenDartClient:
             params = {}
         
         # API 키 추가
-        params["crtfc_key"] = self.api_key
+        params["crtfc_key"] = self.client_id
         
         url = urljoin(self.base_url, endpoint)
         

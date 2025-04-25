@@ -10,65 +10,66 @@ load_dotenv()
 # 로거 설정
 logger = logging.getLogger(__name__)
 
-@dataclass
-class OpenDartConfig:
-    """OpenDART API configuration."""
+class NaverNewsConfig:
+    """Naver News API configuration."""
     
-    api_key: str
-    base_url: str = "https://opendart.fss.or.kr/api/"
-    cache_ttl_hours: int = 1
-    cache_max_size: int = 1000
-    api_rate_limit: int = 1000
-    api_rate_limit_period: int = 3600
-    log_format: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    log_file: str = "opendart.log"
+    def __init__(
+        self,
+        client_id: str,
+        client_secret: str,
+        base_url: str = "https://openapi.naver.com/v1/search/news.json",
+        log_file: str = "naver_news.log"
+    ):
+        self.client_id = client_id
+        self.client_secret = client_secret
+        self.base_url = base_url
+        self.log_file = log_file
     
     @classmethod
-    def from_env(cls) -> "OpenDartConfig":
-        """Create configuration from environment variables.
-
+    def from_env(cls) -> "NaverNewsConfig":
+        """Create a NaverNewsConfig with values from environment variables
+        
         Returns:
-            OpenDartConfig with values from environment variables
-
-        Raises:
-            ValueError: If any required environment variable is missing
+            NaverNewsConfig: Configuration object with values from environment variables
         """
-        api_key = os.getenv("OPENDART_API_KEY")
-        if not api_key:
-            raise ValueError("OpenDART API 키가 설정되지 않았습니다. .env 파일을 확인하세요.")
-            
+        client_id = os.getenv("X_NAVER_CLIENT_ID")
+        client_secret = os.getenv("X_NAVER_CLIENT_SECRET")
+        
+        if not client_id or not client_secret:
+            raise ValueError("Naver News API 클라이언트 ID와 시크릿이 설정되지 않았습니다. .env 파일을 확인하세요.")
+        
         return cls(
-            api_key=api_key,
-            base_url=os.getenv("OPENDART_BASE_URL", "https://opendart.fss.or.kr/api/"),
-            cache_ttl_hours=int(os.getenv("CACHE_TTL_HOURS", "1")),
-            cache_max_size=int(os.getenv("CACHE_MAX_SIZE", "1000")),
-            api_rate_limit=int(os.getenv("API_RATE_LIMIT", "1000")),
-            api_rate_limit_period=int(os.getenv("API_RATE_LIMIT_PERIOD", "3600")),
-            log_format=os.getenv("LOG_FORMAT", "%(asctime)s - %(name)s - %(levelname)s - %(message)s"),
-            log_file=os.getenv("LOG_FILE", "opendart.log")
+            client_id=client_id,
+            client_secret=client_secret,
+            base_url=os.getenv("NAVER_NEWS_BASE_URL", "https://openapi.naver.com/v1/search/news.json"),
+            log_file=os.getenv("LOG_FILE", "naver_news.log")
         )
 
-@dataclass
 class MCPConfig:
-    """MCP Server configuration."""
+    """MCP 서버 설정"""
     
-    host: str = "0.0.0.0"
-    port: int = 8000
-    log_level: str = "INFO"
-    server_name: str = "opendart-mcp"
-    transport: Literal["stdio", "sse"] = "stdio"
+    def __init__(
+        self,
+        server_name: str = "naver-news-mcp",
+        host: str = "localhost",
+        port: int = 8000,
+        log_level: str = "INFO"
+    ):
+        self.server_name = server_name
+        self.host = host
+        self.port = port
+        self.log_level = log_level
     
     @classmethod
     def from_env(cls) -> "MCPConfig":
-        """Create MCP configuration from environment variables."""
+        """Create a MCPConfig with values from environment variables"""
         return cls(
-            host=os.getenv("HOST", "0.0.0.0"),
-            port=int(os.getenv("PORT", "8000")),
-            log_level=os.getenv("LOG_LEVEL", "INFO"),
-            server_name=os.getenv("MCP_SERVER_NAME", "opendart-mcp"),
-            transport=cast(Literal["stdio", "sse"], os.getenv("TRANSPORT", "stdio"))
+            server_name=os.getenv("MCP_SERVER_NAME", "naver-news-mcp"),
+            host=os.getenv("MCP_HOST", "localhost"),
+            port=int(os.getenv("MCP_PORT", "8000")),
+            log_level=os.getenv("LOG_LEVEL", "INFO")
         )
 
 # 설정 인스턴스 생성
+naver_news_config = NaverNewsConfig.from_env()
 mcp_config = MCPConfig.from_env()
-opendart_config = OpenDartConfig.from_env()

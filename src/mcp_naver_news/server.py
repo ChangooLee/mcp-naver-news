@@ -1,4 +1,3 @@
-
 import logging
 import sys
 import asyncio
@@ -8,173 +7,91 @@ from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from typing import Annotated, Any, Literal, Optional
 
-from fastmcp import FastMCP
+from fastmcp import FastMCP, ServerSession
 from mcp.types import TextContent
 from mcp.server.session import ServerSession
 from pydantic import Field
 
-from .config import OpenDartConfig, MCPConfig
-from .apis.client import OpenDartClient
+from .config import NaverNewsConfig, MCPConfig
+from .apis.client import NaverNewsClient
 from .apis import ds001, ds002, ds003, ds004, ds005, ds006
 from typing import AsyncIterator
 
 # 로거 설정
-mcp_config = MCPConfig.from_env()
-level_name = mcp_config.log_level.upper()
-level = getattr(logging, level_name, logging.INFO)
-logger = logging.getLogger("mcp-opendart")
+logger = logging.getLogger("mcp-naver-news")
 
-# 로깅 설정: 출력 형식과 대상 스트림을 지정
-logging.basicConfig(
-    level=level,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    stream=sys.stderr
-)
-
-
-@dataclass
-class OpenDartContext(ServerSession):
-    client: Optional[OpenDartClient] = None
-    ds001: Any = None
-    ds002: Any = None
-    ds003: Any = None
-    ds004: Any = None
-    ds005: Any = None
-    ds006: Any = None
-
-
-    def __post_init__(self):
-        # client가 None이면 기본 클라이언트 생성
-        if self.client is None:
-            from .config import OpenDartConfig, MCPConfig
-            config = OpenDartConfig.from_env()
-            self.client = OpenDartClient(config=config)
-            
-        # API 모듈이 None이면 초기화 (지연 임포트 사용)
-        if self.ds001 is None:
-            from .apis import ds001
-            self.ds001 = ds001.DisclosureAPI(self.client)
-        if self.ds002 is None:
-            from .apis import ds002
-            self.ds002 = ds002.PeriodicReportAPI(self.client)
-        if self.ds003 is None:
-            from .apis import ds003
-            self.ds003 = ds003.FinancialInfoAPI(self.client)
-        if self.ds004 is None:
-            from .apis import ds004
-            self.ds004 = ds004.OwnershipDisclosureAPI(self.client)
-        if self.ds005 is None:
-            from .apis import ds005
-            self.ds005 = ds005.MajorReportAPI(self.client)
-        if self.ds006 is None:
-            from .apis import ds006
-            self.ds006 = ds006.SecuritiesFilingAPI(self.client)
-        
+class NaverNewsContext(ServerSession):
+    """Naver News API 컨텍스트"""
+    
+    client: Optional[NaverNewsClient] = None
+    
+    def __init__(self, client: NaverNewsClient):
+        self.client = client
+    
     async def __aenter__(self):
-        logger.info("🔁 OpenDartContext entered (Claude requested tool execution)")
+        """컨텍스트 진입 시 호출됩니다."""
+        logger.info("🔁 NaverNewsContext entered (Claude requested tool execution)")
         return self
+    
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        """컨텍스트 종료 시 호출됩니다."""
+        logger.info("🔁 NaverNewsContext exited")
 
-    async def __aexit__(self, *args):
-        logger.info("🔁 OpenDartContext exited")
+# Naver News API 클라이언트 초기화
+naver_news_client = NaverNewsClient(config=NaverNewsConfig.from_env())
 
-
-opendart_client = OpenDartClient(config=OpenDartConfig.from_env())
-# 1. OpenDartContext 정의
-opendart_context = OpenDartContext(
-    client=opendart_client,
-    ds001=ds001.DisclosureAPI(opendart_client),
-    ds002=ds002.PeriodicReportAPI(opendart_client),
-    ds003=ds003.FinancialInfoAPI(opendart_client),
-    ds004=ds004.OwnershipDisclosureAPI(opendart_client),
-    ds005=ds005.MajorReportAPI(opendart_client),
-    ds006=ds006.SecuritiesFilingAPI(opendart_client),
+# 1. NaverNewsContext 정의
+naver_news_context = NaverNewsContext(
+    client=naver_news_client
 )
 
-# 2. fallback용 ctx 설정은 이후에
-ctx = opendart_context        
+# 2. FastMCP 서버 생성
+mcp = FastMCP(
+    "Naver News MCP",
+    description="Naver News tools and resources for interacting with news data",
+    lifespan=naver_news_lifespan,
+)
 
-@asynccontextmanager
-async def opendart_lifespan(app: FastMCP) -> AsyncIterator[OpenDartContext]:
-    """Lifespan manager for the OpenDART FastMCP server.
-
-    Creates and manages the OpenDartClient instance and API modules.
-    """
-    logger.info("Initializing OpenDART FastMCP server...")
-
-    # OpenDART 설정 로드
+# 3. 도구 모듈 동적 로드
+for module_name in [
+    "news_tools",
+]:
     try:
-        opendart_config = OpenDartConfig.from_env()
-        mcp_config = MCPConfig.from_env()
+        importlib.import_module(f"mcp_naver_news.tools.{module_name}")
+    except ImportError as e:
+        logger.warning(f"Failed to import tool module {module_name}: {e}")
 
-        logger.info(f"Server Name: {mcp_config.server_name}")
-        logger.info(f"Host: {mcp_config.host}")
-        logger.info(f"Port: {mcp_config.port}")
-        logger.info(f"Log Level: {mcp_config.log_level}")
+logger.info("✅ Initializing Naver News FastMCP server...")
+
+async def naver_news_lifespan(app: FastMCP) -> AsyncIterator[NaverNewsContext]:
+    """Lifespan manager for the Naver News FastMCP server.
+    
+    Creates and manages the NaverNewsClient instance and API modules.
+    """
+    logger.info("Initializing Naver News FastMCP server...")
+    
+    try:
+        # Naver News 설정 로드
+        naver_news_config = NaverNewsConfig.from_env()
         
-        # OpenDART API 클라이언트 초기화
-        client = OpenDartClient(config=opendart_config)
+        # Naver News API 클라이언트 초기화
+        client = NaverNewsClient(config=naver_news_config)
         
-        # API 모듈 초기화
-        ctx = OpenDartContext(
-            client=client,
-            ds001=ds001.DisclosureAPI(client),
-            ds002=ds002.PeriodicReportAPI(client),
-            ds003=ds003.FinancialInfoAPI(client),
-            ds004=ds004.OwnershipDisclosureAPI(client),
-            ds005=ds005.MajorReportAPI(client),
-            ds006=ds006.SecuritiesFilingAPI(client)
+        # 컨텍스트 생성
+        ctx = NaverNewsContext(
+            client=client
         )
         
-        logger.info("OpenDART client and API modules initialized successfully.")
+        logger.info("Naver News client and API modules initialized successfully.")
         yield ctx
         
     except Exception as e:
-        logger.error(f"Failed to initialize OpenDART client: {e}", exc_info=True)
+        logger.error(f"Failed to initialize Naver News client: {e}", exc_info=True)
         raise
-    finally:
-        logger.info("Shutting down OpenDART FastMCP server...")
-
-# Create the main FastMCP instance
-mcp = FastMCP(
-    "OpenDART MCP",
-    description="OpenDART tools and resources for interacting with DART system",
-    lifespan=opendart_lifespan,
-)
-
-import importlib
-for module_name in [
-    "disclosure_tools", "financial_info_tools", "major_report_tools",
-    "ownership_disclosure_tools", "periodic_report_tools", "securities_filing_tools"
-]:
-    importlib.import_module(f"mcp_opendart.tools.{module_name}")
-
-def main():
-    logger.info("✅ Initializing OpenDART FastMCP server...")
     
-    transport = mcp_config.transport
-    port = mcp_config.port
+    finally:
+        logger.info("Shutting down Naver News FastMCP server...")
 
-    if transport == "sse":
-        asyncio.run(run_server(transport="sse", port=port))
-    else:
-        mcp.run()
-
-async def run_server(
-    transport: Literal["stdio", "sse"] = "stdio",
-    port: int = 8000,
-) -> None:
-    """Run the MCP OpenDART server.
-
-    Args:
-        transport: The transport to use. One of "stdio" or "sse".
-        port: The port to use for SSE transport.
-    """
-    if transport == "stdio":
-        # Use the built-in method for stdio transport
-        await mcp.run_stdio_async()
-    elif transport == "sse":
-        # Use FastMCP's built-in SSE runner
-        logger.info(f"Starting server with SSE transport on http://0.0.0.0:{port}")
-        await mcp.run_sse_async(host="0.0.0.0", port=port)  # noqa: S104
-
-# Tool implementations will be added here
+def run_server():
+    """Run the MCP Naver News server."""
+    mcp.run()
