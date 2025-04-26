@@ -16,6 +16,8 @@ from .config import NaverNewsConfig, MCPConfig
 from .apis.client import NaverNewsClient
 from .apis import ds001, ds002, ds003, ds004, ds005, ds006
 from typing import AsyncIterator
+from mcp.server import MCPServer
+from mcp_naver_news.apis.news import NewsAPI
 
 # 로거 설정
 logger = logging.getLogger("mcp-naver-news")
@@ -37,8 +39,20 @@ class NaverNewsContext(ServerSession):
         """컨텍스트 종료 시 호출됩니다."""
         logger.info("🔁 NaverNewsContext exited")
 
-# Naver News API 클라이언트 초기화
-naver_news_client = NaverNewsClient(config=NaverNewsConfig.from_env())
+# MCP 서버 인스턴스 생성
+mcp = MCPServer()
+
+# 설정 로드
+config = NaverNewsConfig.from_env()
+
+# 클라이언트 생성
+client = NaverNewsClient(config)
+
+# API 인스턴스 생성
+news_api = NewsAPI(client)
+
+# API 등록
+mcp.register_api("news", news_api)
 
 # 1. NaverNewsContext 정의
 naver_news_context = NaverNewsContext(

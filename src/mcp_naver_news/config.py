@@ -10,20 +10,14 @@ load_dotenv()
 # 로거 설정
 logger = logging.getLogger(__name__)
 
+@dataclass
 class NaverNewsConfig:
     """Naver News API configuration."""
     
-    def __init__(
-        self,
-        client_id: str,
-        client_secret: str,
-        base_url: str = "https://openapi.naver.com/v1/search/news.json",
-        log_file: str = "naver_news.log"
-    ):
-        self.client_id = client_id
-        self.client_secret = client_secret
-        self.base_url = base_url
-        self.log_file = log_file
+    client_id: str
+    client_secret: str
+    base_url: str = "https://openapi.naver.com/v1/search/news.json"
+    log_file: str = "naver_news.log"
     
     @classmethod
     def from_env(cls) -> "NaverNewsConfig":
@@ -44,21 +38,15 @@ class NaverNewsConfig:
             base_url=os.getenv("NAVER_NEWS_BASE_URL", "https://openapi.naver.com/v1/search/news.json"),
             log_file=os.getenv("LOG_FILE", "naver_news.log")
         )
-
+ 
+@dataclass
 class MCPConfig:
     """MCP 서버 설정"""
     
-    def __init__(
-        self,
-        server_name: str = "naver-news-mcp",
-        host: str = "localhost",
-        port: int = 8000,
-        log_level: str = "INFO"
-    ):
-        self.server_name = server_name
-        self.host = host
-        self.port = port
-        self.log_level = log_level
+    server_name: str = "naver-news-mcp"
+    host: str = "0.0.0.0"
+    port: int = 8000
+    log_level: str = "INFO"
     
     @classmethod
     def from_env(cls) -> "MCPConfig":
