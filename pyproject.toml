@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "mcp-opendart"
+name = "mcp-naver-news"
 version = "0.1.0"
-description = "The Model Context Protocol (MCP) OpenDART integration is an open-source implementation that bridges OpenDART (Korea Financial Supervisory Service's Data Analysis, Retrieval and Transfer System) with AI language models following Anthropic's MCP specification. This project enables secure, contextual AI interactions with OpenDART while maintaining data privacy and security."
+description = "The Model Context Protocol (MCP) Naver News integration is an open-source implementation that bridges Naver News API with AI language models following Anthropic's MCP specification. This project enables secure, contextual AI interactions with Naver News while maintaining data privacy and security."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
@@ -24,7 +24,7 @@ name = "AI Center"
 email = "lchangoo@gmail.com"
 
 [project.scripts]
-mcp-opendart = "mcp_opendart.server:main"
+mcp-naver-news = "mcp_naver_news.server:main"
 
 [project.optional-dependencies]
 dev = [
@@ -40,7 +40,7 @@ dev = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/mcp_opendart"]
+packages = ["src/mcp_naver_news"]
 
 [tool.pytest.ini_options]
 pythonpath = [

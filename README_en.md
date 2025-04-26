@@ -1,21 +1,21 @@
 [한국어](README.md) | English
 
-# MCP OpenDART
+# MCP Naver News
 
-![License](https://img.shields.io/github/license/ChangooLee/mcp-opendart)
-![PyPI Version](https://img.shields.io/pypi/v/mcp-opendart)
-![PyPI Downloads](https://img.shields.io/pypi/dm/mcp-opendart)
+![License](https://img.shields.io/github/license/ChangooLee/mcp-naver-news)
+![PyPI Version](https://img.shields.io/pypi/v/mcp-naver-news)
+![PyPI Downloads](https://img.shields.io/pypi/dm/mcp-naver-news)
 
-Model Context Protocol (MCP) server for OpenDART (Korea Financial Supervisory Service's Data Analysis, Retrieval and Transfer System). This integration enables secure, contextual AI interactions with OpenDART while maintaining data privacy and security.
+Model Context Protocol (MCP) server for Naver News API. This integration enables secure, contextual AI interactions with Naver News while maintaining data privacy and security.
 
 ## Example Usage
 
 Ask your AI assistant to:
 
-- **📊 Financial Reports** - "Get the latest quarterly report for Samsung Electronics"
-- **🔍 Disclosure Search** - "Find major shareholding changes in KOSPI companies last month"
-- **📈 Corporate Analysis** - "Show me the financial statements of Hyundai Motor for the past 3 years"
-- **⚡ Real-time Updates** - "Get today's important disclosures for technology sector"
+- **📰 News Search** - "Find recent news about Samsung Electronics"
+- **🔍 News Analysis** - "Show me the latest technology news"
+- **📊 News Trends** - "What are the trending topics in business news?"
+- **⚡ Real-time Updates** - "Get the latest news about AI developments"
 
 ### Feature Demo
 
@@ -25,39 +25,39 @@ Ask your AI assistant to:
 
 | Feature | Support Status | Description |
 |---------|---------------|-------------|
-| **Disclosure Information** | ✅ Fully supported | Company information and disclosure document search |
-| **Periodic Report Key Information** | ✅ Fully supported | Key information from annual, quarterly, and semi-annual reports |
-| **Periodic Report Financial Information** | ✅ Fully supported | Financial statements and XBRL data |
-| **Comprehensive Share Ownership Information** | ✅ Fully supported | Major shareholders and executive holdings information |
-| **Major Report Key Information** | ✅ Fully supported | Key information from major business reports |
-| **Securities Filing Key Information** | ✅ Fully supported | Key information from securities issuance filings |
+| **News Search** | ✅ Fully supported | Search news articles with various parameters |
+| **News Sorting** | ✅ Fully supported | Sort by date or relevance |
+| **News Filtering** | ✅ Fully supported | Filter by date range and other criteria |
 
 ## Quick Start Guide
 
 ### 1. Authentication Setup
 
-First, obtain your OpenDART API key:
+First, obtain your Naver News API credentials:
 
-1. Go to [OpenDART](https://opendart.fss.or.kr/)
-2. Sign up and request an API key
-3. Wait for approval and receive your API key
+1. Go to [Naver Developers](https://developers.naver.com/)
+2. Register your application
+3. Apply for News Search API usage
+4. Get your Client ID and Client Secret
 
 ### 2. Installation
 
 ```bash
 # Clone repository
-git clone https://github.com/ChangooLee/mcp-opendart.git
-cd mcp-opendart
+git clone https://github.com/ChangooLee/mcp-naver-news.git
+cd mcp-naver-news
 
 # Create virtual environment
 python3 -m venv .venv
 source .venv/bin/activate
 
+# Install package
+pip install -e .
 ```
 
 ## IDE Integration
 
-MCP OpenDART is designed to be used with AI assistants through IDE integration.
+MCP Naver News is designed to be used with AI assistants through IDE integration.
 
 ### Claude Desktop Configuration
 
@@ -67,15 +67,16 @@ MCP OpenDART is designed to be used with AI assistants through IDE integration.
 ```json
 {
   "mcpServers": {
-    "mcp-opendart": {
-      "command": "YOUR_LOCATION/.venv/bin/mcp-opendart",
+    "mcp-naver-news": {
+      "command": "YOUR_LOCATION/.venv/bin/mcp-naver-news",
       "env": {
-        "OPENDART_API_KEY": "API-KEY",
-        "HOST": "0.0.0.0",
-        "PORT": "8000",
+        "X_NAVER_CLIENT_ID": "YOUR_CLIENT_ID",
+        "X_NAVER_CLIENT_SECRET": "YOUR_CLIENT_SECRET",
+        "MCP_SERVER_NAME": "mcp-naver-news",
+        "MCP_HOST": "0.0.0.0",
+        "MCP_PORT": "8000",
         "TRANSPORT": "stdio",
-        "LOG_LEVEL": "INFO",
-        "MCP_SERVER_NAME": "mcp-opendart"
+        "LOG_LEVEL": "INFO"
       }
     }
   }
@@ -84,40 +85,34 @@ MCP OpenDART is designed to be used with AI assistants through IDE integration.
 
 > [!NOTE]
 > - `YOUR_LOCATION`: Replace with the actual path where your virtual environment is installed
-> - `API-KEY`: Replace with your OpenDART API key
+> - `YOUR_CLIENT_ID`: Replace with your Naver API Client ID
+> - `YOUR_CLIENT_SECRET`: Replace with your Naver API Client Secret
 
 ### Environment Variables
 
-- `OPENDART_API_KEY`: Your OpenDART API key
-- `OPENDART_BASE_URL`: API base URL (defaults to official URL)
-- `HOST`: Server host (default: 0.0.0.0)
-- `PORT`: Server port (default: 8000)
-- `TRANSPORT`: Transport method (stdio recommended)
+- `X_NAVER_CLIENT_ID`: Your Naver API Client ID
+- `X_NAVER_CLIENT_SECRET`: Your Naver API Client Secret
+- `MCP_SERVER_NAME`: Server name (default: mcp-naver-news)
+- `MCP_HOST`: Server host (default: 0.0.0.0)
+- `MCP_PORT`: Server port (default: 8000)
 - `LOG_LEVEL`: Logging level (INFO, DEBUG, etc.)
-- `MCP_SERVER_NAME`: Server name
+- `LOG_FILE`: Log file path (default: naver_news.log)
 
 ## Tools
 
-### OpenDART Tools
+### Naver News Tools
 
-- `ds001_disclosure`: Search and retrieve disclosure information
-- `ds002_periodic`: Access periodic report key information
-- `ds003_financial`: Access periodic report financial information
-- `ds004_ownership`: Access comprehensive share ownership information
-- `ds005_major`: Access major report key information
-- `ds006_securities`: Access securities filing key information
+- `search_news`: Search news articles with various parameters
 
 <details>
-<summary>Main Tools List</summary>
+<summary>Tool Parameters</summary>
 
-| Category | Tools |
-|----------|-------|
-| **Disclosure Information** | `get_corporation_code_by_name`, `get_disclosure_list`, `get_corporation_info`, `get_disclosure_document`, `get_corporation_code` |
-| **Periodic Report Key Information** | `get_annual_report`, `get_quarterly_report`, `get_semi_annual_report` |
-| **Periodic Report Financial Information** | `get_single_acnt`, `get_multi_acnt`, `get_xbrl_file`, `get_single_acc`, `get_xbrl_taxonomy`, `get_single_index`, `get_multi_index` |
-| **Comprehensive Share Ownership Information** | `get_major_shareholders`, `get_executive_holdings` |
-| **Major Report Key Information** | `get_major_reports`, `get_business_reports` |
-| **Securities Filing Key Information** | `get_securities_filing`, `get_prospectus` |
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `query` | string | Search keyword |
+| `display` | integer | Number of results to display (default: 10) |
+| `start` | integer | Start position of results (default: 1) |
+| `sort` | string | Sort option (sim: relevance, date: date) |
 
 </details>
 
@@ -126,18 +121,18 @@ MCP OpenDART is designed to be used with AI assistants through IDE integration.
 ### Common Issues
 
 - **Authentication Failures**:
-  - Check if your API key is valid and active
-  - Verify your API key has the necessary permissions
-  - Check if you've exceeded the API rate limit (20,000 calls/day)
+  - Check if your Client ID and Secret are valid
+  - Verify your API credentials have the necessary permissions
+  - Check if you've exceeded the API rate limit
 
 - **Data Access Issues**:
   - Some data may require additional permissions
-  - Certain data might have delayed access (up to 24 hours)
-  - Check if the company is within your accessible range
+  - Check if the search parameters are valid
+  - Ensure your query is properly formatted
 
 - **Connection Problems**:
   - Verify your internet connection
-  - Check if the OpenDART API service is available
+  - Check if the Naver API service is available
   - Ensure your firewall isn't blocking the connection
 
 ### Debugging Tools
@@ -147,15 +142,15 @@ MCP OpenDART is designed to be used with AI assistants through IDE integration.
 export LOG_LEVEL=DEBUG
 
 # View logs
-tail -f opendart.log
+tail -f naver_news.log
 
 # Test API connection
-python -m mcp_opendart test-connection
+python -m mcp_naver_news test-connection
 ```
 
 ## Security
 
-- Never share your API key
+- Never share your API credentials
 - Keep `.env` files secure and private
 - Use appropriate rate limiting
 - Monitor your API usage
@@ -174,4 +169,4 @@ We welcome contributions! If you'd like to contribute:
 
 This project is licensed under the [MIT License](LICENSE).
 
-This is not an official OpenDART product. OpenDART is a registered trademark of the Financial Supervisory Service of Korea. 
+This is not an official Naver product. Naver is a registered trademark of Naver Corporation. 

@@ -22,10 +22,12 @@ def search_news(
     네이버 뉴스 검색
 
     Args:
-        query (str): 검색어
-        display (Optional[int]): 한 번에 표시할 검색 결과 개수 (기본값: 10)
-        start (Optional[int]): 검색 시작 위치 (기본값: 1)
-        sort (Optional[str]): 정렬 옵션 (sim: 정확도순, date: 날짜순, 기본값: sim)
+        query (str): 검색어 (필수)
+        display (Optional[int]): 한 번에 표시할 검색 결과 수 (선택, 기본값: 10)
+        start (Optional[int]): 검색 시작 위치 (선택, 기본값: 1)
+        sort (Optional[Literal["sim", "date"]]): 정렬 옵션 (선택, 기본값: "sim").
+            - "sim" : 정확도순
+            - "date" : 날짜순
 
     참고: https://developers.naver.com/docs/serviceapi/search/news/news.md
     """

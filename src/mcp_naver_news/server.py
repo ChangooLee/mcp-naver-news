@@ -7,17 +7,14 @@ from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from typing import Annotated, Any, Literal, Optional
 
-from fastmcp import FastMCP, ServerSession
+from fastmcp import FastMCP
 from mcp.types import TextContent
 from mcp.server.session import ServerSession
 from pydantic import Field
 
 from .config import NaverNewsConfig, MCPConfig
 from .apis.client import NaverNewsClient
-from .apis import ds001, ds002, ds003, ds004, ds005, ds006
-from typing import AsyncIterator
-from mcp.server import MCPServer
-from mcp_naver_news.apis.news import NewsAPI
+from .apis import NewsAPI
 
 # 로거 설정
 logger = logging.getLogger("mcp-naver-news")
@@ -40,7 +37,10 @@ class NaverNewsContext(ServerSession):
         logger.info("🔁 NaverNewsContext exited")
 
 # MCP 서버 인스턴스 생성
-mcp = MCPServer()
+mcp = FastMCP(
+    "Naver News MCP",
+    description="Naver News tools and resources for interacting with news data",
+)
 
 # 설정 로드
 config = NaverNewsConfig.from_env()
@@ -54,19 +54,13 @@ news_api = NewsAPI(client)
 # API 등록
 mcp.register_api("news", news_api)
 
-# 1. NaverNewsContext 정의
+# 컨텍스트 생성
 naver_news_context = NaverNewsContext(
-    client=naver_news_client
+    client=client
 )
 
-# 2. FastMCP 서버 생성
-mcp = FastMCP(
-    "Naver News MCP",
-    description="Naver News tools and resources for interacting with news data",
-    lifespan=naver_news_lifespan,
-)
-
-# 3. 도구 모듈 동적 로드
+# 도구 모듈 동적 로드
+import importlib
 for module_name in [
     "news_tools",
 ]:
@@ -77,7 +71,7 @@ for module_name in [
 
 logger.info("✅ Initializing Naver News FastMCP server...")
 
-async def naver_news_lifespan(app: FastMCP) -> AsyncIterator[NaverNewsContext]:
+async def naver_news_lifespan(app: FastMCP) -> AsyncGenerator[NaverNewsContext, None]:
     """Lifespan manager for the Naver News FastMCP server.
     
     Creates and manages the NaverNewsClient instance and API modules.
