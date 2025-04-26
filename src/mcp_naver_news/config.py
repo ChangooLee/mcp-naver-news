@@ -47,7 +47,7 @@ class MCPConfig:
     host: str = "0.0.0.0"
     port: int = 8000
     log_level: str = "INFO"
-    
+    transport: Literal["stdio", "sse"] = "stdio"
     @classmethod
     def from_env(cls) -> "MCPConfig":
         """Create a MCPConfig with values from environment variables"""
@@ -55,7 +55,8 @@ class MCPConfig:
             server_name=os.getenv("MCP_SERVER_NAME", "naver-news-mcp"),
             host=os.getenv("MCP_HOST", "localhost"),
             port=int(os.getenv("MCP_PORT", "8000")),
-            log_level=os.getenv("LOG_LEVEL", "INFO")
+            log_level=os.getenv("LOG_LEVEL", "INFO"),
+            transport=cast(Literal["stdio", "sse"], os.getenv("TRANSPORT", "stdio"))
         )
 
 # 설정 인스턴스 생성

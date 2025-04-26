@@ -18,6 +18,7 @@ from .apis.news import NewsAPI
 
 # 로거 설정
 logger = logging.getLogger("mcp-naver-news")
+mcp_config = MCPConfig.from_env()
 
 @dataclass
 class NaverNewsContext(ServerSession):
@@ -54,7 +55,7 @@ naver_news_context = NaverNewsContext(
 ctx = naver_news_context
 
 @asynccontextmanager
-async def naver_news_lifespan(app: FastMCP) -> AsyncIterator[NaverNewsContext]:
+async def naver_news_lifespan(app: FastMCP) -> AsyncGenerator[NaverNewsContext, None]:
     """Lifespan manager for the Naver News FastMCP server.
     
     Creates and manages the NaverNewsClient instance and API modules.

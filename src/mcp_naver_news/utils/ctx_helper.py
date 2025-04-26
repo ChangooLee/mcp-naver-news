@@ -1,9 +1,9 @@
 import logging
 from typing import Any, Callable, Optional
 
-from mcp_opendart.server import opendart_context
+from mcp_naver_news.server import naver_news_context
 
-logger = logging.getLogger("mcp-opendart")
+logger = logging.getLogger("mcp-naver-news")
 
 def with_context(
     ctx: Optional[Any],
@@ -32,4 +32,4 @@ def with_context(
             logger.warning(f"⚠️ MCPContext 접근 실패: {e}")
 
     logger.warning("⚠️ Fallback 전역 컨텍스트 사용")
-    return fallback_func(opendart_context)
+    return fallback_func(naver_news_context)
