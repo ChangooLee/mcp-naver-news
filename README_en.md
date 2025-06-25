@@ -207,6 +207,8 @@ We welcome contributions! If you'd like to contribute:
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is for non-commercial and personal use only. Commercial use, redistribution, or creation of derivative works for commercial purposes is strictly prohibited.
+
+See the LICENSE file for full terms.
 
 This is not an official Naver product. Naver is a registered trademark of Naver Corporation. 

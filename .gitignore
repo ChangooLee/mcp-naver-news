@@ -27,6 +27,7 @@ wheels/
 env/
 venv/
 ENV/
+output/
 
 # IDE
 .idea/
@@ -39,3 +40,4 @@ ENV/
 
 # Local development
 .DS_Store 
+news_keyword_collector.py
