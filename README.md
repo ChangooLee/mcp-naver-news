@@ -143,26 +143,26 @@ MCP Naver News는 IDE 통합을 통해 AI 어시스턴트와 함께 사용하도
 ### 네이버 뉴스 도구
 
 > **추천 분석 전략:**
-> 빠르고 깊이 있는 뉴스 분석을 위해, 먼저 `search_news_light`로 기사 후보를 빠르게 리서치·필터링하세요. 이후 심층적 이해나 본문 전체 분석이 필요한 경우 `search_news`로 robust하게 본문을 추출해 분석하세요. 이 2단계 워크플로우는 폭넓은 탐색과 정밀한 인사이트를 모두 제공합니다.
+> 빠르고 깊이 있는 뉴스 분석을 위해, 반드시 `search_news`로 기사 후보를 빠르게 리서치·필터링하세요. 이후 심층적 이해나 본문 전체 분석이 필요한 경우에만 `search_news_detail`로 robust하게 본문을 추출해 분석하세요. 이 2단계 워크플로우는 폭넓은 탐색과 정밀한 인사이트를 모두 제공합니다.
 
-- `search_news_light`: 네이버 뉴스 API 결과(제목, 요약, 링크 등)만 빠르게 반환합니다. 기사 본문은 추출하지 않습니다. 빠른 탐색, 키워드 요약에 적합합니다.
-- `search_news`: 네이버 뉴스 API 결과와 함께 실제 기사 페이지에서 robust하게 본문을 추출합니다. 정확한 기사 본문이 필요할 때 사용하세요.
+- `search_news`: 네이버 뉴스 API 결과(제목, 요약, 링크 등)만 빠르게 반환합니다. 기사 본문은 추출하지 않습니다. 빠른 탐색, 키워드 요약에 적합하며, 반드시 먼저 사용해야 합니다.
+- `search_news_detail`: `search_news`로 1차 필터 후, 실제 기사 페이지에서 robust하게 본문을 추출합니다. 정확한 기사 본문이 필요할 때만 사용하세요.
 
 #### 추천 워크플로우
 
-1. `search_news_light`로 키워드별 기사 요약 리스트를 빠르게 확인합니다.
-2. 관심 있는 기사에 대해 `search_news`로 실제 본문을 robust하게 추출해 분석합니다.
+1. `search_news`로 키워드별 기사 요약 리스트를 빠르게 확인합니다.
+2. 관심 있는 기사에 대해 `search_news_detail`로 실제 본문을 robust하게 추출해 심층 분석합니다.
 
 <details>
 <summary>도구 파라미터</summary>
 
 | 도구                | 파라미터           | 타입     | 설명                                         |
 |---------------------|--------------------|----------|----------------------------------------------|
-| search_news_light   | `query`            | string   | 검색 키워드                                  |
+| search_news         | `query`            | string   | 검색 키워드                                  |
 |                     | `display`          | integer  | 표시할 결과 수 (기본값: 10)                  |
 |                     | `start`            | integer  | 결과 시작 위치 (기본값: 1)                   |
 |                     | `sort`             | string   | 정렬 옵션 (sim: 관련도, date: 날짜)           |
-| search_news         | `query`            | string   | 검색 키워드                                  |
+| search_news_detail  | `query`            | string   | 검색 키워드                                  |
 |                     | `display`          | integer  | 표시할 결과 수 (기본값: 10)                  |
 |                     | `start`            | integer  | 결과 시작 위치 (기본값: 1)                   |
 |                     | `sort`             | string   | 정렬 옵션 (sim: 관련도, date: 날짜)           |

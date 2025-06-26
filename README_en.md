@@ -143,30 +143,30 @@ MCP Naver News is designed to be used with AI assistants through IDE integration
 ### Naver News Tools
 
 > **Recommended Analysis Strategy:**
-> For efficient and deep news analysis, first use `search_news_light` to quickly research, filter, and shortlist articles based on summaries and metadata. When you identify articles that require deeper understanding or full content analysis, use `search_news` to robustly extract and analyze the complete article text. This two-step workflow enables both broad exploration and targeted, in-depth insight, making your research process both fast and thorough.
+> For efficient and deep news analysis, always use `search_news` first to quickly research, filter, and shortlist articles based on summaries and metadata. Only after identifying articles of interest should you use `search_news_detail` for robust, in-depth extraction and analysis of the full article content. This two-step workflow enables both broad exploration and targeted, in-depth insight, making your research process both fast and thorough.
 
-- `search_news_light`: Quickly search news articles and return only the Naver API results (title, summary, link, etc.). Does not extract the full article content. Use this for fast exploration and keyword-based summaries.
-- `search_news`: Search news articles and robustly extract the actual article content from the web page. Use this when you need the full, accurate article text.
+- `search_news`: Quickly search news articles using the Naver News API and return only the API results (title, summary, link, etc.). This tool does NOT extract the full article content, making it fast and lightweight. Use this for initial exploration, filtering, and keyword-based summaries. **Always use this tool first!**
+- `search_news_detail`: After filtering with `search_news`, use this tool to robustly extract and analyze the full article content from the web page. This tool is slower and more resource-intensive, but provides the full, accurate article text for in-depth analysis. **Use only for articles that require deep understanding.**
 
 #### Typical Workflow
 
-1. Use `search_news_light` to quickly browse and filter articles by summary and metadata.
-2. For articles of interest, use `search_news` to extract and analyze the full article content.
+1. Use `search_news` to quickly browse and filter articles by summary and metadata.
+2. For articles of interest, use `search_news_detail` to extract and analyze the full article content.
 
 <details>
 <summary>Tool Parameters</summary>
 
-| Tool                | Parameter      | Type     | Description                                             |
-|---------------------|---------------|----------|---------------------------------------------------------|
-| search_news_light   | `query`       | string   | Search keyword                                          |
-|                     | `display`     | integer  | Number of results to display (default: 10)              |
-|                     | `start`       | integer  | Start position of results (default: 1)                  |
-|                     | `sort`        | string   | Sort option (sim: relevance, date: date)                |
-| search_news         | `query`       | string   | Search keyword                                          |
-|                     | `display`     | integer  | Number of results to display (default: 10)              |
-|                     | `start`       | integer  | Start position of results (default: 1)                  |
-|                     | `sort`        | string   | Sort option (sim: relevance, date: date)                |
-|                     | `include_content` | bool  | Whether to extract full article content (default: true) |
+| Tool                | Parameter         | Type     | Description                                             |
+|---------------------|------------------|----------|---------------------------------------------------------|
+| search_news         | `query`          | string   | Search keyword                                          |
+|                     | `display`        | integer  | Number of results to display (default: 10)              |
+|                     | `start`          | integer  | Start position of results (default: 1)                  |
+|                     | `sort`           | string   | Sort option (sim: relevance, date: date)                |
+| search_news_detail  | `query`          | string   | Search keyword                                          |
+|                     | `display`        | integer  | Number of results to display (default: 10)              |
+|                     | `start`          | integer  | Start position of results (default: 1)                  |
+|                     | `sort`           | string   | Sort option (sim: relevance, date: date)                |
+|                     | `include_content`| bool     | Whether to extract full article content (default: true) |
 
 </details>
 
